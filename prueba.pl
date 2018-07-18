@@ -7,7 +7,7 @@ use RecDescent;
 # );
 #
 # $parser = new Parse::RecDescent($grammar);
-#tidentifier guard_inter(s) transition_def(s? /,/) 
+#tidentifier guard_inter(s) transition_def(s? /,/)
 
 # Create and compile the source file
 
@@ -20,15 +20,15 @@ $parser = Parse::RecDescent->new(q(
   didentifier:letter(letter(s?)|digit(s?))
   letter:/\w/
   digit:/\d/
-  transition_def: (tidentifier guard_inter(s?))(s /,/) 
-  guard_inter:"guard" guard_def
-  guard_def:'a'
+  transition_def: (tidentifier guard_inter(s?))(s /,/)
+  guard_inter: "guard" guard_def
+  guard_def: var_cond
   tidentifier: didentifier
   arc_def: 'a'
   place_def:'p'
   init_def:'i'
   denum:"{"dvalue(s /,/)"}"
-  dprod: didentifier "X" didentifier
+  dprod: didentifier"X"
   dsetop: didentifier setop didentifier
   setop: "U" | "∩" | "-"
   evaluations:evaluation(s)
@@ -37,6 +37,13 @@ $parser = Parse::RecDescent->new(q(
   string:cap_letter(s)
   integer:digit(s)
   cap_letter:/[A-Z]/
+  var_cond: videntifier arc_cond
+  videntifier: didentifier
+  relop: "&&" | "||"
+  arc_cond: boolop
+  boolop: "boolop"
+  extdvalue: "x"
+  exprvalue: 'ex'
 
 ));
 
