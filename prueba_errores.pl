@@ -12,9 +12,9 @@ use RecDescent;
 # Create and compile the source file
 
 $parser = Parse::RecDescent->new(q(
-  startrule : identificador(2 /X/)
-  identificador: letter(letter|digit)
-  letter:/\w/
+  startrule : identificador
+  identificador: letter(letter(s?)|digit(s?))
+  letter:/[a-z]/
   digit:/\d/
 
 ));

@@ -13,16 +13,18 @@ use RecDescent;
 $::RD_ERRORS = 1; #Parser dies when it encounters an error
 $::RD_WARN   = 1; # Enable warnings- warn on unused rules &c.
 $::RD_HINT   = 1; # Give out hints to help fix problems.
+$::RD_TRACE  = 1;      # if defined, also trace parsers' behaviour
+
 $parser = Parse::RecDescent->new(q(
   startrule :declarations
 
   declarations: declaration(s)
   declaration:"define" ("domain" domain_def|"trans" transition_def|"arc" arc_def|"place" place_def|"init" init_def) ';'
   domain_def:didentifier "=" (denum|dprod|dsetop)
-  didentifier:letter letter(s?)|digit(s?)
-  letter:/\w/
+  didentifier:letter(s)digit(s?)
+  letter:/[a-z]/
   digit:/\d/
-  transition_def: (tidentifier guard_inter(s?))(s /,/)
+  transition_def: (tidentifier "guard" guard_def)(s /,/)
   guard_inter: "guard" guard_def
   guard_def: var_cond
   tidentifier: didentifier
@@ -42,9 +44,9 @@ $parser = Parse::RecDescent->new(q(
   var_cond: videntifier arc_cond
   videntifier: didentifier
   relop: "&&" | "||"
-  arc_cond: boolop
-  boolop: "boolop"
-  extdvalue: "x"
+  arc_cond: boolop extdvalue
+  boolop: "="|"!="|"<"|">"
+  extdvalue: exprvalue
   exprvalue: 'ex'
 
 ));
