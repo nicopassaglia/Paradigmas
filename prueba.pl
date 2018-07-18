@@ -10,14 +10,16 @@ use RecDescent;
 #tidentifier guard_inter(s) transition_def(s? /,/)
 
 # Create and compile the source file
-
+$::RD_ERRORS = 1; #Parser dies when it encounters an error
+$::RD_WARN   = 1; # Enable warnings- warn on unused rules &c.
+$::RD_HINT   = 1; # Give out hints to help fix problems.
 $parser = Parse::RecDescent->new(q(
   startrule :declarations
 
   declarations: declaration(s)
   declaration:"define" ("domain" domain_def|"trans" transition_def|"arc" arc_def|"place" place_def|"init" init_def) ';'
   domain_def:didentifier "=" (denum|dprod|dsetop)
-  didentifier:letter(letter(s?)|digit(s?))
+  didentifier:letter letter(s?)|digit(s?)
   letter:/\w/
   digit:/\d/
   transition_def: (tidentifier guard_inter(s?))(s /,/)
@@ -28,7 +30,7 @@ $parser = Parse::RecDescent->new(q(
   place_def:'p'
   init_def:'i'
   denum:"{"dvalue(s /,/)"}"
-  dprod: didentifier"X"
+  dprod:didentifier(2 /X/)
   dsetop: didentifier setop didentifier
   setop: "U" | "∩" | "-"
   evaluations:evaluation(s)
