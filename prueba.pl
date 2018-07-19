@@ -14,6 +14,7 @@ $::RD_ERRORS = 1; #Parser dies when it encounters an error
 $::RD_WARN   = 1; # Enable warnings- warn on unused rules &c.
 $::RD_HINT   = 1; # Give out hints to help fix problems.
 $::RD_TRACE  = 1;      # if defined, also trace parsers' behaviour
+#$Parse::RecDescent::skip = '[ \r]+';
 
 $parser = Parse::RecDescent->new(q(
   startrule :declarations
@@ -21,7 +22,8 @@ $parser = Parse::RecDescent->new(q(
   declarations: declaration(s)
   declaration:"define" ("domain" domain_def|"trans" transition_def|"arc" arc_def|"place" place_def|"init" init_def) ';'
   domain_def:didentifier "=" (denum|dprod|dsetop)
-  didentifier:letter(s)digit(s?)
+  didentifier:/(([a-z]+\d*)(?=[^\d]|\s))/
+  espacio: /\s+/
   letter:/[a-z]/
   digit:/\d/
   transition_def: (tidentifier "guard" guard_def)(s /,/)

@@ -2433,7 +2433,7 @@ sub Parse::RecDescent::namespace000001::didentifier
     my $text;
     my $lastsep;
     my $current_match;
-    my $expectation = new Parse::RecDescent::Expectation(q{letter});
+    my $expectation = new Parse::RecDescent::Expectation(q{/(([a-z]+\\d*)(?=[^\\d]|\\s))/});
     $expectation->at($_[1]);
     
     my $thisline;
@@ -2443,8 +2443,8 @@ sub Parse::RecDescent::namespace000001::didentifier
 
     while (!$_matched && !$commit)
     {
-        local $skip = defined($skip) ? $skip : $Parse::RecDescent::skip;
-        Parse::RecDescent::_trace(q{Trying production: [letter digit <skip:" ">]},
+        
+        Parse::RecDescent::_trace(q{Trying production: [/(([a-z]+\\d*)(?=[^\\d]|\\s))/]},
                       Parse::RecDescent::_tracefirst($_[1]),
                       q{didentifier},
                       $tracelevel)
@@ -2457,89 +2457,34 @@ sub Parse::RecDescent::namespace000001::didentifier
         my $repcount = 0;
 
 
-        Parse::RecDescent::_trace(q{Trying repeated subrule: [letter]},
-                  Parse::RecDescent::_tracefirst($text),
-                  q{didentifier},
-                  $tracelevel)
-                    if defined $::RD_TRACE;
+        Parse::RecDescent::_trace(q{Trying terminal: [/(([a-z]+\\d*)(?=[^\\d]|\\s))/]}, Parse::RecDescent::_tracefirst($text),
+                      q{didentifier},
+                      $tracelevel)
+                        if defined $::RD_TRACE;
+        undef $lastsep;
         $expectation->is(q{})->at($text);
         
-        unless (defined ($_tok = $thisparser->_parserepeat($text, \&Parse::RecDescent::namespace000001::letter, 1, 100000000, $_noactions,$expectation,sub { \@arg },undef)))
+
+        unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ m/\A(?:(([a-z]+\d*)(?=[^\d]|\s)))/)
         {
-            Parse::RecDescent::_trace(q{<<Didn't match repeated subrule: [letter]>>},
-                          Parse::RecDescent::_tracefirst($text),
-                          q{didentifier},
-                          $tracelevel)
-                            if defined $::RD_TRACE;
-            last;
-        }
-        Parse::RecDescent::_trace(q{>>Matched repeated subrule: [letter]<< (}
-                    . @$_tok . q{ times)},
-
-                      Parse::RecDescent::_tracefirst($text),
-                      q{didentifier},
-                      $tracelevel)
-                        if defined $::RD_TRACE;
-        $item{q{letter(s)}} = $_tok;
-        push @item, $_tok;
-        
-
-
-        Parse::RecDescent::_trace(q{Trying repeated subrule: [digit]},
-                  Parse::RecDescent::_tracefirst($text),
-                  q{didentifier},
-                  $tracelevel)
+            $text = $lastsep . $text if defined $lastsep;
+            $expectation->failed();
+            Parse::RecDescent::_trace(q{<<Didn't match terminal>>},
+                          Parse::RecDescent::_tracefirst($text))
                     if defined $::RD_TRACE;
-        $expectation->is(q{digit})->at($text);
-        
-        unless (defined ($_tok = $thisparser->_parserepeat($text, \&Parse::RecDescent::namespace000001::digit, 0, 100000000, $_noactions,$expectation,sub { \@arg },undef)))
-        {
-            Parse::RecDescent::_trace(q{<<Didn't match repeated subrule: [digit]>>},
-                          Parse::RecDescent::_tracefirst($text),
-                          q{didentifier},
-                          $tracelevel)
-                            if defined $::RD_TRACE;
+
             last;
         }
-        Parse::RecDescent::_trace(q{>>Matched repeated subrule: [digit]<< (}
-                    . @$_tok . q{ times)},
-
-                      Parse::RecDescent::_tracefirst($text),
-                      q{didentifier},
-                      $tracelevel)
-                        if defined $::RD_TRACE;
-        $item{q{digit(s?)}} = $_tok;
-        push @item, $_tok;
+        $current_match = substr($text, $-[0], $+[0] - $-[0]);
+        substr($text,0,length($current_match),q{});
+        Parse::RecDescent::_trace(q{>>Matched terminal<< (return value: [}
+                        . $current_match . q{])},
+                          Parse::RecDescent::_tracefirst($text))
+                    if defined $::RD_TRACE;
+        push @item, $item{__PATTERN1__}=$current_match;
         
 
-
-        
-
-        Parse::RecDescent::_trace(q{Trying directive: [<skip:" ">]},
-                    Parse::RecDescent::_tracefirst($text),
-                      q{didentifier},
-                      $tracelevel)
-                        if defined $::RD_TRACE; 
-        $_tok = do { my $oldskip = $skip; $skip=" "; $oldskip };
-        if (defined($_tok))
-        {
-            Parse::RecDescent::_trace(q{>>Matched directive<< (return value: [}
-                        . $_tok . q{])},
-                        Parse::RecDescent::_tracefirst($text))
-                            if defined $::RD_TRACE;
-        }
-        else
-        {
-            Parse::RecDescent::_trace(q{<<Didn't match directive>>},
-                        Parse::RecDescent::_tracefirst($text))
-                            if defined $::RD_TRACE;
-        }
-        
-        last unless defined $_tok;
-        push @item, $item{__DIRECTIVE1__}=$_tok;
-        
-
-        Parse::RecDescent::_trace(q{>>Matched production: [letter digit <skip:" ">]<<},
+        Parse::RecDescent::_trace(q{>>Matched production: [/(([a-z]+\\d*)(?=[^\\d]|\\s))/]<<},
                       Parse::RecDescent::_tracefirst($text),
                       q{didentifier},
                       $tracelevel)
@@ -3573,6 +3518,142 @@ sub Parse::RecDescent::namespace000001::dvalue
                       Parse::RecDescent::_tracemax(substr($_[1],0,-length($text))) . q{])},
                       Parse::RecDescent::_tracefirst($text),
                       , q{dvalue},
+                      $tracelevel)
+    }
+    $_[1] = $text;
+    return $return;
+}
+
+# ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args, $_itempos)
+sub Parse::RecDescent::namespace000001::espacio
+{
+	my $thisparser = $_[0];
+	use vars q{$tracelevel};
+	local $tracelevel = ($tracelevel||0)+1;
+	$ERRORS = 0;
+    my $thisrule = $thisparser->{"rules"}{"espacio"};
+
+    Parse::RecDescent::_trace(q{Trying rule: [espacio]},
+                  Parse::RecDescent::_tracefirst($_[1]),
+                  q{espacio},
+                  $tracelevel)
+                    if defined $::RD_TRACE;
+
+    
+    my $err_at = @{$thisparser->{errors}};
+
+    my $score;
+    my $score_return;
+    my $_tok;
+    my $return = undef;
+    my $_matched=0;
+    my $commit=0;
+    my @item = ();
+    my %item = ();
+    my $repeating =  $_[2];
+    my $_noactions = $_[3];
+    my @arg =    defined $_[4] ? @{ &{$_[4]} } : ();
+    my $_itempos = $_[5];
+    my %arg =    ($#arg & 01) ? @arg : (@arg, undef);
+    my $text;
+    my $lastsep;
+    my $current_match;
+    my $expectation = new Parse::RecDescent::Expectation(q{/\\s+/});
+    $expectation->at($_[1]);
+    
+    my $thisline;
+    tie $thisline, q{Parse::RecDescent::LineCounter}, \$text, $thisparser;
+
+    
+
+    while (!$_matched && !$commit)
+    {
+        
+        Parse::RecDescent::_trace(q{Trying production: [/\\s+/]},
+                      Parse::RecDescent::_tracefirst($_[1]),
+                      q{espacio},
+                      $tracelevel)
+                        if defined $::RD_TRACE;
+        my $thisprod = $thisrule->{"prods"}[0];
+        $text = $_[1];
+        my $_savetext;
+        @item = (q{espacio});
+        %item = (__RULE__ => q{espacio});
+        my $repcount = 0;
+
+
+        Parse::RecDescent::_trace(q{Trying terminal: [/\\s+/]}, Parse::RecDescent::_tracefirst($text),
+                      q{espacio},
+                      $tracelevel)
+                        if defined $::RD_TRACE;
+        undef $lastsep;
+        $expectation->is(q{})->at($text);
+        
+
+        unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ m/\A(?:\s+)/)
+        {
+            $text = $lastsep . $text if defined $lastsep;
+            $expectation->failed();
+            Parse::RecDescent::_trace(q{<<Didn't match terminal>>},
+                          Parse::RecDescent::_tracefirst($text))
+                    if defined $::RD_TRACE;
+
+            last;
+        }
+        $current_match = substr($text, $-[0], $+[0] - $-[0]);
+        substr($text,0,length($current_match),q{});
+        Parse::RecDescent::_trace(q{>>Matched terminal<< (return value: [}
+                        . $current_match . q{])},
+                          Parse::RecDescent::_tracefirst($text))
+                    if defined $::RD_TRACE;
+        push @item, $item{__PATTERN1__}=$current_match;
+        
+
+        Parse::RecDescent::_trace(q{>>Matched production: [/\\s+/]<<},
+                      Parse::RecDescent::_tracefirst($text),
+                      q{espacio},
+                      $tracelevel)
+                        if defined $::RD_TRACE;
+
+
+
+        $_matched = 1;
+        last;
+    }
+
+
+    unless ( $_matched || defined($score) )
+    {
+        
+
+        $_[1] = $text;  # NOT SURE THIS IS NEEDED
+        Parse::RecDescent::_trace(q{<<Didn't match rule>>},
+                     Parse::RecDescent::_tracefirst($_[1]),
+                     q{espacio},
+                     $tracelevel)
+                    if defined $::RD_TRACE;
+        return undef;
+    }
+    if (!defined($return) && defined($score))
+    {
+        Parse::RecDescent::_trace(q{>>Accepted scored production<<}, "",
+                      q{espacio},
+                      $tracelevel)
+                        if defined $::RD_TRACE;
+        $return = $score_return;
+    }
+    splice @{$thisparser->{errors}}, $err_at;
+    $return = $item[$#item] unless defined $return;
+    if (defined $::RD_TRACE)
+    {
+        Parse::RecDescent::_trace(q{>>Matched rule<< (return value: [} .
+                      $return . q{])}, "",
+                      q{espacio},
+                      $tracelevel);
+        Parse::RecDescent::_trace(q{(consumed: [} .
+                      Parse::RecDescent::_tracemax(substr($_[1],0,-length($text))) . q{])},
+                      Parse::RecDescent::_tracefirst($text),
+                      , q{espacio},
                       $tracelevel)
     }
     $_[1] = $text;
