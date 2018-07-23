@@ -1,6 +1,7 @@
 #!/usr/bin/perl
-use RecDescent;
 
+use RecDescent;
+use Data::Dumper;
 # $grammar = q(
 #   startrule: "c"(s)
 #
@@ -15,6 +16,8 @@ $::RD_WARN   = 1; # Enable warnings- warn on unused rules &c.
 $::RD_HINT   = 1; # Give out hints to help fix problems.
 #$::RD_TRACE  = 1;      # if defined, also trace parsers' behaviour
 #$Parse::RecDescent::skip = '[ \r]+';
+
+$::RD_AUTOACTION = q { [@item] };
 
 $parser = Parse::RecDescent->new(q(
   startrule :declarations evaluations
@@ -90,4 +93,9 @@ ten from termina var d = (p+1)%5;
 define init piensa={0,1,2,3,4}, ten={0,1,2,3,4}; list transitions;";
 #print "Valido" if $prueba =~ /c*|a*/;
 #print $parser->startrule;
-defined $parser->startrule($prueba) or die "didn't match \n";
+#defined $parser->startrule($prueba) or die "didn't match \n";
+
+
+my $result = $parser->startrule($prueba);
+
+print Dumper($result);
