@@ -1,0 +1,4 @@
+Como utilizar:
+1) Correr comando "ghci" en terminal
+2) Cargar el modulo parser con el siguiente comando ":l parser"
+3) Correr la funcion que parsea el texto corriendo "parser"
